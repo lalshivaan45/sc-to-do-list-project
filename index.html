@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Reminder App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>📋 Todo Reminder</h1>
+                <p>Organize tasks, set reminders, and stay productive</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Lists</h2>
+                    <button id="addListBtn" class="btn-icon" title="Add new list">+</button>
+                </div>
+                <nav class="lists-nav" id="listsNav">
+                    <div class="list-item active" data-list-id="inbox">
+                        <span class="list-name">📥 Inbox</span>
+                        <span class="list-count">0</span>
+                    </div>
+                    <div class="list-item" data-list-id="today">
+                        <span class="list-name">📅 Today</span>
+                        <span class="list-count">0</span>
+                    </div>
+                    <div class="list-item" data-list-id="upcoming">
+                        <span class="list-name">🔮 Upcoming</span>
+                        <span class="list-count">0</span>
+                    </div>
+                    <div class="list-item" data-list-id="completed">
+                        <span class="list-name">✅ Completed</span>
+                        <span class="list-count">0</span>
+                    </div>
+                </nav>
+
+                <div class="sidebar-section">
+                    <h3>Custom Lists</h3>
+                    <div id="customLists"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Tags</h3>
+                    <div id="tagsList"></div>
+                </div>
+            </aside>
+
+            <!-- Main Work Area -->
+            <section class="work-area">
+                <!-- Task Creation -->
+                <div class="task-creator">
+                    <input 
+                        type="text" 
+                        id="taskInput" 
+                        class="task-input" 
+                        placeholder="Add a new task..."
+                    >
+                    <button id="addTaskBtn" class="btn btn-primary">Add Task</button>
+                </div>
+
+                <!-- Filters and Sort -->
+                <div class="controls-bar">
+                    <div class="filter-group">
+                        <label>Filter:</label>
+                        <select id="priorityFilter">
+                            <option value="">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="sort-group">
+                        <label>Sort by:</label>
+                        <select id="sortBy">
+                            <option value="dateAdded">Date Added</option>
+                            <option value="dueDate">Due Date</option>
+                            <option value="priority">Priority</option>
+                            <option value="assignee">Assignee</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tasks List -->
+                <div class="tasks-container" id="tasksContainer">
+                    <div class="empty-state">
+                        <p>📝 No tasks yet. Create one to get started!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-body">
+                <h2>Task Details</h2>
+                
+                <div class="form-group">
+                    <label for="modalTaskTitle">Title</label>
+                    <input type="text" id="modalTaskTitle" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="modalTaskDesc">Description</label>
+                    <textarea id="modalTaskDesc" class="form-input" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalTaskDueDate">Due Date</label>
+                        <input type="date" id="modalTaskDueDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalTaskPriority">Priority</label>
+                        <select id="modalTaskPriority" class="form-input">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalTaskAssignee">Assignee</label>
+                        <input type="text" id="modalTaskAssignee" class="form-input" placeholder="Name or email">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalTaskList">List</label>
+                        <select id="modalTaskList" class="form-input"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modalTaskTags">Tags (comma-separated)</label>
+                    <input type="text" id="modalTaskTags" class="form-input" placeholder="e.g., work, urgent, review">
+                </div>
+
+                <div class="form-group">
+                    <label for="modalTaskSubtasks">Subtasks</label>
+                    <div id="subtasksList"></div>
+                    <button type="button" id="addSubtaskBtn" class="btn btn-secondary btn-sm">+ Add Subtask</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Reminders</label>
+                    <div id="remindersList"></div>
+                    <button type="button" id="addReminderBtn" class="btn btn-secondary btn-sm">+ Add Reminder</button>
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="modalTaskRecurring">
+                    <label for="modalTaskRecurring">Recurring Task</label>
+                </div>
+
+                <div id="recurringOptions" class="hidden">
+                    <div class="form-group">
+                        <label for="modalTaskRecurrenceType">Recurrence</label>
+                        <select id="modalTaskRecurrenceType" class="form-input">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="saveTaslBtn" class="btn btn-primary">Save Task</button>
+                    <button id="deletTaskBtn" class="btn btn-danger">Delete Task</button>
+                    <button id="closeModalBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add List Modal -->
+    <div id="addListModal" class="modal">
+        <div class="modal-content modal-sm">
+            <span class="modal-close">&times;</span>
+            <h2>Create New List</h2>
+            <input type="text" id="newListName" class="form-input" placeholder="List name...">
+            <div class="modal-actions">
+                <button id="createListBtn" class="btn btn-primary">Create</button>
+                <button id="cancelListBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
